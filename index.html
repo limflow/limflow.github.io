@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Limflow — Лимур, учусь разрабатывать с помощью ИИ</title>
+  <title>Limflow | Лимур, учусь разрабатывать с помощью ИИ</title>
   <meta name="description" content="Лимур (Limflow): учусь разрабатывать и вайб-кодить, делаю проекты с помощью нейросетей и выкладываю их по одному.">
   <meta name="theme-color" content="#0F1115">
-  <meta property="og:title" content="Limflow — Лимур">
+  <meta property="og:title" content="Limflow | Лимур">
   <meta property="og:description" content="Учусь разрабатывать и вайб-кодить. Маленькие проекты, по одному.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://limflow.github.io/">
@@ -160,6 +160,15 @@
       padding: 2px 12px;
     }
 
+    .project + .project { margin-top: 14px; }
+    .play {
+      display: inline-block; margin-left: 10px; margin-top: 10px;
+      color: var(--text); text-decoration: none;
+      border: 2px solid var(--accent); border-radius: 10px; padding: 2px 16px;
+      transition: background .2s, color .2s;
+    }
+    .play:hover { background: var(--accent); color: var(--bg); }
+
     .stack { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
     .stack li {
       border: 1px solid var(--line);
@@ -234,6 +243,12 @@
     <section class="reveal" aria-labelledby="projects">
       <h2 id="projects">Проекты</h2>
       <article class="project" id="tilt">
+        <h3>Хвостогонка</h3>
+        <p>Мини-игра в браузере: лемур бежит всё быстрее, прыгает, пригибается под птицами и собирает шарики.</p>
+        <span class="status">можно играть</span>
+        <a class="play" href="game/">Играть</a>
+      </article>
+      <article class="project plain">
         <h3>Этот сайт</h3>
         <p>Моя первая страничка: собрана на HTML и CSS вместе с нейросетями и выложена через GitHub Pages.</p>
         <span class="status">готово</span>
