@@ -13,7 +13,7 @@
   <link rel="icon" type="image/png" href="../limflow-mark-dark.png">
   <style>
     :root { --bg:#0F1115; --surface:#171A20; --text:#F2EEE6; --muted:#B9B4A9; --line:#2C2F38; --accent:#FF7A1A; }
-    * { margin:0; padding:0; box-sizing:border-box; }
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
     html { background:var(--bg); }
     body {
       min-height:100vh; background:var(--bg); color:var(--text);
@@ -37,7 +37,20 @@
       display:block; width:100%; aspect-ratio:800 / 360;
       border:2px solid var(--line); border-radius:14px; background:#14171D;
       cursor:pointer; touch-action:none; user-select:none; -webkit-user-select:none;
+      -webkit-touch-callout:none; outline:none;
     }
+    .top, .pad { user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; }
+    .pad { display:none; gap:12px; margin-top:12px; }
+    .pad-btn {
+      flex:1; height:92px; font:inherit; font-size:20px; font-weight:600;
+      color:var(--text); background:var(--surface); border:2px solid var(--line); border-radius:18px;
+      touch-action:none; cursor:pointer;
+    }
+    .pad-btn.jump { flex:1.6; border-color:var(--accent); }
+    .pad-btn.on { background:var(--accent); color:var(--bg); }
+    .rotate { display:none; color:var(--muted); font-size:14px; margin-top:10px; }
+    @media (pointer: coarse) { .pad { display:flex; } }
+    @media (pointer: coarse) and (orientation: portrait) { .rotate { display:block; } }
     .hint { color:var(--muted); font-size:14px; margin-top:10px; }
 
     .about { margin-top:32px; display:grid; gap:20px; }
@@ -66,7 +79,12 @@
     </div>
 
     <canvas id="c" tabindex="0" aria-label="Игра Хвостогонка: лемур бежит, прыгает и пригибается"></canvas>
-    <p class="hint">Пробел, стрелка вверх или W: прыжок (держишь дольше, прыгаешь выше). Стрелка вниз или S: пригнуться. P: пауза, M: звук. На телефоне тап по верхней части экрана прыгает, а удержание внизу пригибает. Если клавиши не работают, кликни по игре один раз.</p>
+    <div class="pad" aria-label="Кнопки управления">
+      <button type="button" class="pad-btn" id="btn-duck">Пригнуться</button>
+      <button type="button" class="pad-btn jump" id="btn-jump">Прыжок</button>
+    </div>
+    <p class="rotate">Поверни телефон боком, тогда игра станет крупнее.</p>
+    <p class="hint">Пробел, стрелка вверх или W: прыжок (держишь дольше, прыгаешь выше). Стрелка вниз или S: пригнуться. P: пауза, M: звук. На телефоне тап по игре или большая кнопка внизу прыгает, вторая кнопка пригибает. Если клавиши не работают, кликни по игре один раз.</p>
 
     <div class="about">
       <section class="card" aria-labelledby="about-game">
@@ -206,11 +224,28 @@
   canvas.addEventListener("pointerdown", function (e) {
     e.preventDefault(); canvas.focus();
     if (paused) { setPaused(false); return; }
-    var r = canvas.getBoundingClientRect();
-    var low = (e.clientY - r.top) / r.height > 0.68;
-    if (e.pointerType === "touch" && low && state === "run") { touchDuck = true; return; }
     jump();
   });
+  canvas.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+
+  function holdButton(id, onDown, onUp) {
+    var b = document.getElementById(id);
+    if (!b) return;
+    b.addEventListener("pointerdown", function (e) {
+      e.preventDefault();
+      try { b.setPointerCapture(e.pointerId); } catch (err) {}
+      b.className += " on";
+      audio();
+      if (paused) { setPaused(false); return; }
+      onDown();
+    });
+    function up() { b.className = b.className.replace(" on", ""); onUp(); }
+    b.addEventListener("pointerup", up);
+    b.addEventListener("pointercancel", up);
+    b.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+  }
+  holdButton("btn-jump", function () { jump(); }, function () { release(); });
+  holdButton("btn-duck", function () { touchDuck = true; }, function () { touchDuck = false; });
   function pointerEnd() { release(); touchDuck = false; }
   window.addEventListener("pointerup", pointerEnd);
   window.addEventListener("pointercancel", pointerEnd);
